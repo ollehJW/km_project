@@ -230,3 +230,48 @@ class PointInferenceDatasetGenerator(object):
 
         test_dataset = ConstructInferencePointDataset(self.file_list)
         return dict({'test': DataLoader(test_dataset, batch_size=1, shuffle=False)})
+
+class ConstructInferenceClassDataset(Dataset):
+    """
+    Construct pytorch Dataset from file list.
+    Parameters
+    ----------
+    file_list : list
+        image file list
+    phase : str
+        train phase. (Default: 'train')
+    Returns
+    --------
+    pytorch Dataset
+    """
+
+    def __init__(self, file_list):
+        self.file_list = file_list
+
+    def __len__(self):
+        return len(self.file_list)
+
+    def __getitem__(self, index):
+        image = Image.open(self.file_list[index])
+        image = transform_dict['test'](image)
+        return {'image': image, 'fname': self.file_list[index]}
+
+
+class ClassInferenceDatasetGenerator(object):
+    """
+    Construct pytorch DataLoader from file list.
+    Parameters
+    ----------
+    file_list : list
+        image file list
+    Returns
+    --------
+    pytorch DataLoader
+    """
+    def __init__(self, file_list):
+        self.file_list = file_list
+
+    def dataloader(self):
+
+        test_dataset = ConstructInferenceClassDataset(self.file_list)
+        return dict({'test': DataLoader(test_dataset, batch_size=1, shuffle=False)})
